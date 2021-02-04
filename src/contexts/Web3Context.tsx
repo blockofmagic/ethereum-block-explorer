@@ -1,18 +1,19 @@
-import React from 'react';
-import Web3 from 'web3';
-import axios, { AxiosResponse } from 'axios';
-import actionComposer from '../utils/actionComposer';
-import { Block } from 'web3-eth';
-import { BlockHeader } from 'web3/eth/types';
-import { NODE_ENV, RAZZLE_PRODUCT_ID } from '../inject.env';
-
+import React from "react";
+import Web3 from "web3";
+import axios, { AxiosResponse } from "axios";
+import actionComposer from "../utils/actionComposer";
+import { Block } from "web3-eth";
+import { BlockHeader } from "web3/eth/types";
+import { NODE_ENV } from "../inject.env";
 
 // Initial State
 //
-const initialState: Web3Context.State = {
-  web3: new Web3(new Web3.providers.WebsocketProvider(
-    `wss://mainnet.infura.io/ws/v3/${RAZZLE_PRODUCT_ID}`
-  )),
+const initialState: Web3Context.Web3Context.State = {
+  web3: new Web3(
+    new Web3.providers.WebsocketProvider(
+      `wss://mainnet.infura.io/ws/v3/83ba6b5fd5ec409392237cb564211f6c`
+    )
+  ),
   headerSubscription: undefined,
   blocks: {},
   blockRangeVisible: [Infinity, -Infinity],
@@ -25,10 +26,9 @@ const initialState: Web3Context.State = {
   },
 };
 
-
 // Initial Context
 //
-const initialContext: Web3Context.Value = {
+const initialContext: Web3Context.Web3Context.Value = {
   state: initialState,
   actions: {
     setBlock: (block: { [blockNumber: number]: Block }) => undefined,
@@ -37,39 +37,41 @@ const initialContext: Web3Context.Value = {
   },
 };
 
-
 // Reducer
 //
 const themeReducer = (
-  state: Web3Context.State = initialState,
+  state: Web3Context.Web3Context.State = initialState,
   action: ActionType
 ) => {
   switch (action.type) {
-  case 'SET_WEB3':
-    return { ...state, web3: action.payload };
-  case 'SET_SUBSCRIPTION':
-    return { ...state, headerSubscription: action.payload };
-  case 'UPDATE_BLOCK_RANGE':
-    return { ...state, blockRangeVisible: action.payload };
-  case 'SET_ETH_PRICE':
-    return { ...state, ethPrice: action.payload };
-  case 'SET_BLOCK':
-    const block: Block | any = Object.values(action.payload)[0] || {};
-    return {
-      ...state,
-      blocks: { ...state.blocks, ...action.payload },
-      statistics: {
-        gasUsed: state.statistics.gasUsed + (block.gasUsed || 0),
-        gasPrice: state.statistics.gasPrice + ([0, ...block.transactions].reduce((a, b) => a + +b.gasPrice) || 0),
-        fullness: state.statistics.fullness + (block.gasUsed / block.gasLimit || 0),
-        transactionCount: state.statistics.transactionCount + block.transactions.length,
-      },
-    };
-  default:
-    return state;
+    case "SET_WEB3":
+      return { ...state, web3: action.payload };
+    case "SET_SUBSCRIPTION":
+      return { ...state, headerSubscription: action.payload };
+    case "UPDATE_BLOCK_RANGE":
+      return { ...state, blockRangeVisible: action.payload };
+    case "SET_ETH_PRICE":
+      return { ...state, ethPrice: action.payload };
+    case "SET_BLOCK":
+      const block: Block | any = Object.values(action.payload)[0] || {};
+      return {
+        ...state,
+        blocks: { ...state.blocks, ...action.payload },
+        statistics: {
+          gasUsed: state.statistics.gasUsed + (block.gasUsed || 0),
+          gasPrice:
+            state.statistics.gasPrice +
+            ([0, ...block.transactions].reduce((a, b) => a + +b.gasPrice) || 0),
+          fullness:
+            state.statistics.fullness + (block.gasUsed / block.gasLimit || 0),
+          transactionCount:
+            state.statistics.transactionCount + block.transactions.length,
+        },
+      };
+    default:
+      return state;
   }
 };
-
 
 // Exports
 //
@@ -81,21 +83,25 @@ export const Web3ContextProvider = (props: any) => {
    * anywhere with the consumer
    */
 
-
   // Create Reducer
   //
   const [_state, dispatch] = React.useReducer(themeReducer, initialState);
   const state = _state!;
 
-
   // Curate Actions
   //
-  
-  const setBlock: DispatchFunction = actionComposer(dispatch, 'SET_BLOCK');
-  const showNewerBlocks: DispatchFunction = () => actionComposer(dispatch, 'UPDATE_BLOCK_RANGE')([
-    state.blockRangeVisible[0],
-    (Object.values(state.blocks)[Object.values(state.blocks).length - 1] as Block).number,
-  ]);
+
+  const setBlock: DispatchFunction = actionComposer(dispatch, "SET_BLOCK");
+  const showNewerBlocks: DispatchFunction = () =>
+    actionComposer(
+      dispatch,
+      "UPDATE_BLOCK_RANGE"
+    )([
+      state.blockRangeVisible[0],
+      (Object.values(state.blocks)[
+        Object.values(state.blocks).length - 1
+      ] as Block).number,
+    ]);
 
   //  Get block by number
   const getBlock = (blockNumber: number) => {
@@ -112,33 +118,36 @@ export const Web3ContextProvider = (props: any) => {
   };
 
   // Get surrent ETH price
-  const setCurrentEthPrice = () => (
-    axios.get('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD')
-      .then((value: AxiosResponse<any>) => actionComposer(dispatch, 'SET_ETH_PRICE')(value.data.USD))
+  const setCurrentEthPrice = () =>
+    axios
+      .get("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=EUR")
+      .then((value: AxiosResponse<any>) =>
+        actionComposer(dispatch, "SET_ETH_PRICE")(value.data.EUR)
+      )
       .catch((err: Error) => {
-        if (NODE_ENV !== 'production') {
+        if (NODE_ENV !== "production") {
           console.log(err);
         }
         return state.ethPrice;
-      })
-  );
+      });
 
   // Fetch 20 earlier blocks than currently in the state
   const getMoreBlocks = () => {
     const range = state.blockRangeVisible;
     const earliestBlock = range[0] - 20;
     let i = range[0];
-    
+
     while (i-- > earliestBlock) {
       getBlock(i);
       range[0] = Math.min(i, range[0]);
     }
-    actionComposer(dispatch, 'UPDATE_BLOCK_RANGE')(range);
+    actionComposer(dispatch, "UPDATE_BLOCK_RANGE")(range);
   };
 
   // Get either missed (after reconnect) or last 20 blocks (fresh init)
   const getRecentBlocks = () => {
-    state.web3.eth.getBlockNumber()
+    state.web3.eth
+      .getBlockNumber()
       .then((blockNumber: number) => {
         let i = blockNumber;
         let range = [Infinity, -Infinity];
@@ -151,10 +160,10 @@ export const Web3ContextProvider = (props: any) => {
           getBlock(i);
           range = [Math.min(i, range[0]), Math.max(i, range[1])];
         }
-        actionComposer(dispatch, 'UPDATE_BLOCK_RANGE')(range);
+        actionComposer(dispatch, "UPDATE_BLOCK_RANGE")(range);
       })
       .catch(() => {
-        console.log('Could not get current block number...');
+        console.log("Could not get current block number...");
       });
   };
 
@@ -162,15 +171,14 @@ export const Web3ContextProvider = (props: any) => {
   const subscribeToNewBlockHeaders = () => {
     getRecentBlocks();
 
-    const headerSubscription = state.web3.eth.subscribe('newBlockHeaders');
+    const headerSubscription = state.web3.eth.subscribe("newBlockHeaders");
 
-    headerSubscription
-      .on('data', (block: BlockHeader) => {
-        setCurrentEthPrice();
-        getBlock(block.number - 1);
-      });
+    headerSubscription.on("data", (block: BlockHeader) => {
+      setCurrentEthPrice();
+      getBlock(block.number - 1);
+    });
 
-    actionComposer(dispatch, 'SET_SUBSCRIPTION')(headerSubscription);
+    actionComposer(dispatch, "SET_SUBSCRIPTION")(headerSubscription);
   };
 
   // On mount, subscribe to newBlockHeaders pub/sub feed
@@ -182,10 +190,9 @@ export const Web3ContextProvider = (props: any) => {
       state.headerSubscription && state.headerSubscription.unsubscribe();
     };
   }, []);
-  
 
   // Create context value
-  const web3ContextValue: Web3Context.Value = {
+  const Web3ContextValue: Web3Context.Web3Context.Value = {
     state,
     actions: {
       setBlock,
@@ -195,7 +202,7 @@ export const Web3ContextProvider = (props: any) => {
   };
 
   return (
-    <Web3Context.Provider value={web3ContextValue}>
+    <Web3Context.Provider value={Web3ContextValue}>
       {props.children}
     </Web3Context.Provider>
   );

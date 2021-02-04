@@ -1,9 +1,15 @@
 {
   "presets": [
-    "razzle/babel",
+    "@babel/preset-react",
+    ["@babel/preset-env", { "targets": { "node": "current" } }],
+    "@babel/preset-typescript"
   ],
   "plugins": [
+    "@babel/plugin-syntax-bigint",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-optional-chaining",
     "babel-plugin-dynamic-import-webpack",
-    "react-loadable/babel", 
+    "react-loadable/babel",
+    "babel-plugin-transform-scss"
   ]
 }

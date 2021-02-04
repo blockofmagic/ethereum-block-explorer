@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 
-import './Card.scss';
+import "./Card.scss";
 
 export type CardProps = React.ComponentProps<any>;
 
 const Card = ({ className, children, ...props }: CardProps) => (
   <section className={`card-container ${className}`} {...props}>
-    {...children}
+    {children}
   </section>
 );
 

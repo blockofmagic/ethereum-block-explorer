@@ -1,14 +1,12 @@
-import React from 'react';
-import { Switch, Route, Redirect } from 'react-router';
+import React from "react";
+import { Switch, Route, Redirect } from "react-router";
 
-import ExplorerView from '../Views/ExplorerView/Loadable';
-import Nav from '../common/Nav/Loadable';
+import ExplorerView from "../Views/ExplorerView/Loadable";
 
-import './Content.scss';
+import "./Content.scss";
 
 const Content = () => (
   <div className="content-container">
-    <Nav />
     <Switch>
       <Route path="/explorer" component={ExplorerView} />
       <Route path="/" render={() => <Redirect to="/explorer" />} />
