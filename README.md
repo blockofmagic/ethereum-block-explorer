@@ -33,8 +33,6 @@ Want to check out a live action demo?
 
 ## Getting started
 1) Make sure you have:
-    * `node v10.13.0+`
-    * `npm | yarn`
     * `a computer`
 2) Clone this repository
 3) `cd <CLONED_DIRECTORY>`
@@ -42,14 +40,8 @@ Want to check out a live action demo?
 
 ### Building and running
 ```bash
-$ npm run build && npm run start:prod
+$ npm run build
 ```
-
-### Running dev mode
-```bash
-$ npm start
-```
-
 
 ## Notes
 * Operates one block behind current block
