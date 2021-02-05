@@ -19,22 +19,28 @@
     z-index: -1;
     padding: 16px 14px;
     width: 253px;
-    height: 66px;
+    height: 80px;
     max-height: none;
     max-width: none;
     background: white;
     box-shadow: 0px 2px 5px 2px rgba(0, 0, 0, 0.15);
-  
+
     transform: translate(16px, -32px);
-    animation: explorertransactionblock-tooltip-appear 100ms  linear forwards;
+    animation: explorertransactionblock-tooltip-appear 100ms linear forwards;
 
     @keyframes explorertransactionblock-tooltip-appear {
-      from { transform: translate(16px, -32px); opacity: 0; }
-      to { transform: translate(40px, -32px); opacity: 1; }
+      from {
+        transform: translate(16px, -32px);
+        opacity: 0;
+      }
+      to {
+        transform: translate(40px, -32px);
+        opacity: 1;
+      }
     }
 
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       height: 16px;
       width: 16px;
@@ -42,10 +48,9 @@
       transform: translate(-20px, 0) rotate(45deg);
     }
 
-    
     .explorertransactionblock-tooltip-field,
     .explorertransactionblock-tooltip-value {
-      font-family: 'Lineto Akkuratmono Regular';
+      font-family: "Lineto Akkuratmono Regular";
       font-size: 12px;
       line-height: normal;
     }
@@ -64,7 +69,7 @@
       justify-content: space-between;
       width: 100%;
     }
-    
+
     .explorertransactionblock-tooltip-bottom {
       > div {
         width: 100%;
@@ -78,7 +83,6 @@
         }
       }
     }
-    
   }
 
   .explorertransactionblock-block {
@@ -88,11 +92,11 @@
     background: rgba(0, 5, 255, 0.25);
 
     &.active {
-      background: rgba(0, 5, 255, 0.70);
+      background: rgba(0, 5, 255, 0.7);
     }
 
     &:hover {
       background: rgba(0, 5, 255, 1);
     }
-  } 
+  }
 }
